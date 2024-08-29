@@ -96,6 +96,7 @@ export default function Home() {
         crossOrigin="anonymous"
         controls
         autoplay={false}
+        webkit-playsinline playsinline
         width="600"
         poster="big_buck_bunny_title_658w.jpg"
         onPlay={() => setCanPlayMedia(true)}
