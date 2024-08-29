@@ -91,7 +91,7 @@ export default function Home() {
       <div class="text-4xl">Audio Normalization Demo</div>
 
       <video
-        class="mx-auto bg-black"
+        class="mx-auto bg-black aspect-video"
         preload="auto"
         crossOrigin="anonymous"
         controls
