@@ -14,35 +14,35 @@ export default function Home() {
   const [release, setRelease] = createSignal(1); // seconds
   const [gain, setGain] = createSignal(1); // gain
 
+  const [canPlayMedia, setCanPlayMedia] = createSignal(true); // gain
+
   // Audio context, nodes, and compressor setup
   let audioContext: AudioContext | null = null;
   let sourceNode: MediaElementAudioSourceNode | null = null;
   let compressor: DynamicsCompressorNode | null = null;
   let gainNode: GainNode | null = null;
 
-  createEffect(() => {
-    // Get the video element
-    const videoElement = document.querySelector('video');
-    if (!videoElement) {
-      throw new Error('Video element not found!');
-    }
-
-    // Initialize the Audio Context once
+  // Function to initialize the AudioContext and nodes
+  const initializeAudioContext = () => {
     if (!audioContext) {
       audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-    }
-
-    // Create Audio Nodes if not already created
-    if (!sourceNode) {
+      const videoElement = document.querySelector('video');
+      if (!videoElement) {
+        throw new Error('Video element not found!');
+      }
       sourceNode = audioContext.createMediaElementSource(videoElement);
-    }
-    if (!gainNode) {
       gainNode = audioContext.createGain();
-      gainNode.gain.setValueAtTime(gain(), audioContext.currentTime); // 1 means no change in volume
+      gainNode.gain.setValueAtTime(gain(), audioContext.currentTime);
     }
+  };
 
+  createEffect(() => {
     if (compressorEnabled()) {
       console.log('🔥 setting up compressor !!');
+      initializeAudioContext();
+      if (!audioContext || !sourceNode || !gainNode) {
+        throw new Error('Audio context or source node not initialized!');
+      }
 
       // Create Compressor Node if not already created
       if (!compressor) {
@@ -59,10 +59,10 @@ export default function Home() {
       console.log('🔥 bypassing compressor !!');
 
       // Bypass Compressor & Gain: source -> destination
-      sourceNode.disconnect();
+      sourceNode?.disconnect();
       compressor?.disconnect();
       gainNode?.disconnect();
-      sourceNode.connect(audioContext.destination);
+      audioContext && sourceNode?.connect(audioContext.destination);
     }
 
     // Cleanup effect when component unmounts
@@ -91,13 +91,14 @@ export default function Home() {
       <div class="text-4xl">Audio Normalization Demo</div>
 
       <video
-        class="mx-auto"
+        class="mx-auto bg-black"
         preload="auto"
         crossOrigin="anonymous"
         controls
         autoplay={false}
         width="600"
         poster="big_buck_bunny_title_658w.jpg"
+        onPlay={() => setCanPlayMedia(true)}
       >
         <source
           id="mp4"
