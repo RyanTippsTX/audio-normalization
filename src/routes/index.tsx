@@ -14,8 +14,6 @@ export default function Home() {
   const [release, setRelease] = createSignal(1); // seconds
   const [gain, setGain] = createSignal(1); // gain
 
-  const [canPlayMedia, setCanPlayMedia] = createSignal(true); // gain
-
   // Audio context, nodes, and compressor setup
   let audioContext: AudioContext | null = null;
   let sourceNode: MediaElementAudioSourceNode | null = null;
@@ -96,10 +94,10 @@ export default function Home() {
         crossOrigin="anonymous"
         controls
         autoplay={false}
-        webkit-playsinline playsinline
+        webkit-playsinline
+        playsinline
         width="600"
         poster="big_buck_bunny_title_658w.jpg"
-        onPlay={() => setCanPlayMedia(true)}
       >
         <source
           id="mp4"
