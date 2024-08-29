@@ -6,7 +6,7 @@ export default function Home() {
   // signal to track if the compressor is enabled
   const [compressorEnabled, setCompressorEnabled] = createSignal(false);
 
-  // aggressive settings
+  // aggressive defaults
   const [threshold, setThreshold] = createSignal(-60); // db
   const [knee, setKnee] = createSignal(3); // db
   const [ratio, setRatio] = createSignal(45); // ratio
@@ -117,9 +117,8 @@ export default function Home() {
         {compressorEnabled() ? 'Disable Compressor' : 'Enable Compressor'}
       </button>
 
-      {/* MDN Docs link */}
-      <div>
-        {/* https://developer.mozilla.org/en-US/docs/Web/API/DynamicsCompressorNode */}
+      {/* MDN Docs & source code */}
+      <div class="flex flex-xcol items-center justify-center space-x-2">
         <a
           href="https://developer.mozilla.org/en-US/docs/Web/API/DynamicsCompressorNode"
           target="_blank"
@@ -127,6 +126,15 @@ export default function Home() {
           class="text-blue-500 text-smx hover:underline"
         >
           MDN Docs
+        </a>
+        <span>/</span>
+        <a
+          href="https://github.com/RyanTippsTX/audio-normalization"
+          target="_blank"
+          rel="noreferrer"
+          class="text-blue-500 text-smx hover:underline"
+        >
+          Source Code
         </a>
       </div>
 
