@@ -88,7 +88,7 @@ export default function Home() {
 
   return (
     <main class="container mx-auto flex justify-center items-center flex-col py-16 space-y-8">
-      <div class="text-4xl">Audio Normalization Demo</div>
+      <div class="text-4xl text-center">Audio Normalization Demo</div>
 
       <video
         class="mx-auto bg-black aspect-video"
