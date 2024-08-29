@@ -1,5 +1,6 @@
 import { createEffect, createSignal, onCleanup } from 'solid-js';
 import { Slider } from '~/components/Slider';
+import clsx from 'clsx';
 
 export default function Home() {
   // signal to track if the compressor is enabled
@@ -107,7 +108,10 @@ export default function Home() {
 
       {/* Button to toggle audio compressor */}
       <button
-        class="rounded-full bg-blue-500 text-white px-4 py-2"
+        class={clsx(
+          'rounded-full bg-blue-500 text-white px-4 py-2',
+          compressorEnabled() ? 'bg-red-500' : 'bg-blue-500'
+        )}
         onClick={() => setCompressorEnabled((prev) => !prev)} // Toggle audio compressor
       >
         {compressorEnabled() ? 'Disable Compressor' : 'Enable Compressor'}
