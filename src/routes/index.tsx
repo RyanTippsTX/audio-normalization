@@ -130,7 +130,7 @@ export default function Home() {
         </a>
         <span>/</span>
         <a
-          href="https://github.com/RyanTippsTX/audio-normalization"
+          href="https://github.com/RyanTippsTX/audio-normalization/blob/master/src/routes/index.tsx"
           target="_blank"
           rel="noreferrer"
           class="text-blue-500 text-smx hover:underline"
