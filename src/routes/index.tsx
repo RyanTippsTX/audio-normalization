@@ -26,19 +26,24 @@ export default function Home() {
       throw new Error('Video element not found!');
     }
 
-    // If audio is enabled, set up the compressor
+    // Initialize the Audio Context once
+    if (!audioContext) {
+      audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    }
+
+    // Create Audio Nodes if not already created
+    if (!sourceNode) {
+      sourceNode = audioContext.createMediaElementSource(videoElement);
+    }
+    if (!gainNode) {
+      gainNode = audioContext.createGain();
+      gainNode.gain.setValueAtTime(gain(), audioContext.currentTime); // 1 means no change in volume
+    }
+
     if (compressorEnabled()) {
       console.log('🔥 setting up compressor !!');
 
-      // Initialize the Audio Context once
-      if (!audioContext) {
-        audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      }
-
-      // Create Audio Nodes if not already created
-      if (!sourceNode) {
-        sourceNode = audioContext.createMediaElementSource(videoElement);
-      }
+      // Create Compressor Node if not already created
       if (!compressor) {
         compressor = audioContext.createDynamicsCompressor();
         // Configure compressor settings
@@ -48,31 +53,28 @@ export default function Home() {
         compressor.attack.setValueAtTime(attack(), audioContext.currentTime); // 0 ms attack
         compressor.release.setValueAtTime(release(), audioContext.currentTime); // 1 second release
       }
-      if (!gainNode) {
-        gainNode = audioContext.createGain();
-        gainNode.gain.setValueAtTime(gain(), audioContext.currentTime); // 1 means no change in volume
-      }
 
-      // Connect nodes if not already connected
+      // Connect nodes: source -> compressor -> gain -> destination
+      sourceNode.disconnect(); // Ensure no duplicate connections
       sourceNode.connect(compressor);
       compressor.connect(gainNode);
       gainNode.connect(audioContext.destination);
-
-      // Cleanup effect when component unmounts or audio is disabled
-      onCleanup(() => {
-        sourceNode?.disconnect();
-        compressor?.disconnect();
-        gainNode?.disconnect();
-      });
     } else {
-      // If audio is disabled, clean up the compressor
-      if (audioContext) {
-        console.log('🔥 cleaning up compressor !!');
-        sourceNode?.disconnect();
-        compressor?.disconnect();
-        gainNode?.disconnect();
-      }
+      console.log('🔥 bypassing compressor !!');
+
+      // Bypass Compressor: connect source directly to gain -> destination
+      sourceNode.disconnect();
+      compressor?.disconnect();
+      sourceNode.connect(gainNode);
+      gainNode.connect(audioContext.destination);
     }
+
+    // Cleanup effect when component unmounts
+    onCleanup(() => {
+      sourceNode?.disconnect();
+      compressor?.disconnect();
+      gainNode?.disconnect();
+    });
   });
 
   return (
