@@ -97,7 +97,7 @@ export default function Home() {
         controls
         autoplay={false}
         width="600"
-        poster="https://illudiumfilm.com/big_buck_bunny_title_658w.jpg"
+        poster="big_buck_bunny_title_658w.jpg"
       >
         <source
           id="mp4"
