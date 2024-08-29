@@ -114,7 +114,7 @@ export default function Home() {
       </button>
 
       {/* Sliders to adjust compressor settings */}
-      <div class="w-full max-w-xl space-y-4">
+      <div class="w-full max-w-lg space-y-4">
         {/* Threshold Slider */}
         <Slider
           id="thresholdSlider"
@@ -166,7 +166,7 @@ export default function Home() {
           label="Attack (s)"
           description="How quickly the compressor starts to compress the signal after it exceeds the threshold."
           min={0}
-          max={1}
+          max={0.25}
           step={0.001}
           value={attack()}
           onInput={(newValue) => {
