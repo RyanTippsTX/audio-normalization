@@ -9,7 +9,7 @@ export default function Home() {
   // aggressive defaults
   const [threshold, setThreshold] = createSignal(-60); // db
   const [knee, setKnee] = createSignal(3); // db
-  const [ratio, setRatio] = createSignal(45); // ratio
+  const [ratio, setRatio] = createSignal(20); // ratio
   const [attack, setAttack] = createSignal(0.01); // seconds
   const [release, setRelease] = createSignal(1); // seconds
   const [gain, setGain] = createSignal(1); // gain
@@ -177,7 +177,7 @@ export default function Home() {
           label="Ratio"
           description="The amount of compression (e.g., 12:1 means for every 12 dB above the threshold, only 1 dB will pass through)."
           min={1}
-          max={50}
+          max={20}
           step={1}
           value={ratio()}
           onInput={(newValue) => {
