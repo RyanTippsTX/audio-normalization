@@ -1,9 +1,9 @@
-import { createEffect, createSignal } from 'solid-js';
+import { createEffect, createSignal, onCleanup } from 'solid-js';
 import { Likes } from '~/components/Likes';
 
 export default function Home() {
-  // signal audioEnabled bool
-  const [audioEnabled, setAudioEnabled] = createSignal(false);
+  // signal to track if the compressor is enabled
+  const [compressorEnabled, setCompressorEnabled] = createSignal(false);
 
   // aggressive settings
   const [threshold, setThreshold] = createSignal(-60); // db
@@ -13,47 +13,66 @@ export default function Home() {
   const [release, setRelease] = createSignal(1); // seconds
   const [gain, setGain] = createSignal(1);
 
+  // Audio context, nodes, and compressor setup
+  let audioContext: AudioContext | null = null;
+  let sourceNode: MediaElementAudioSourceNode | null = null;
+  let compressor: DynamicsCompressorNode | null = null;
+  let gainNode: GainNode | null = null;
+
   createEffect(() => {
-    if (!audioEnabled()) {
-      return;
-    }
-
-    console.log('🔥 setting up compressor !!');
-
-    // Step 1: Create an audio context
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-
-    // Step 2: Select the video element
+    // Get the video element
     const videoElement = document.querySelector('video');
-
     if (!videoElement) {
       throw new Error('Video element not found!');
     }
 
-    // Step 3: Create a MediaElementAudioSourceNode from the video element
-    const sourceNode = audioContext.createMediaElementSource(videoElement);
+    // If audio is enabled, set up the compressor
+    if (compressorEnabled()) {
+      console.log('🔥 setting up compressor !!');
 
-    // Step 4: Create a DynamicsCompressorNode
-    const compressor = audioContext.createDynamicsCompressor();
+      // Initialize the Audio Context once
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
 
-    // Configure compressor settings
-    compressor.threshold.setValueAtTime(threshold(), audioContext.currentTime); // -50 dB threshold
-    compressor.knee.setValueAtTime(knee(), audioContext.currentTime);
-    compressor.ratio.setValueAtTime(ratio(), audioContext.currentTime);
-    compressor.attack.setValueAtTime(attack(), audioContext.currentTime);
-    compressor.release.setValueAtTime(release(), audioContext.currentTime);
+      // Create Audio Nodes if not already created
+      if (!sourceNode) {
+        sourceNode = audioContext.createMediaElementSource(videoElement);
+      }
+      if (!compressor) {
+        compressor = audioContext.createDynamicsCompressor();
+        // Configure compressor settings
+        compressor.threshold.setValueAtTime(threshold(), audioContext.currentTime); // -60 dB threshold
+        compressor.knee.setValueAtTime(knee(), audioContext.currentTime); // 0 dB knee
+        compressor.ratio.setValueAtTime(ratio(), audioContext.currentTime); // 50:1 compression ratio
+        compressor.attack.setValueAtTime(attack(), audioContext.currentTime); // 0 ms attack
+        compressor.release.setValueAtTime(release(), audioContext.currentTime); // 1 second release
+      }
+      if (!gainNode) {
+        gainNode = audioContext.createGain();
+        gainNode.gain.setValueAtTime(gain(), audioContext.currentTime); // 1 means no change in volume
+      }
 
-    // Step 5: Create a GainNode (optional, for additional volume control)
-    const gainNode = audioContext.createGain();
-    gainNode.gain.setValueAtTime(gain(), audioContext.currentTime); // 1 means no change in volume
+      // Connect nodes if not already connected
+      sourceNode.connect(compressor);
+      compressor.connect(gainNode);
+      gainNode.connect(audioContext.destination);
 
-    // Step 6: Connect the nodes
-    sourceNode.connect(compressor);
-    compressor.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-
-    // Step 7: Play the video to test the effect
-    videoElement.play();
+      // Cleanup effect when component unmounts or audio is disabled
+      onCleanup(() => {
+        sourceNode?.disconnect();
+        compressor?.disconnect();
+        gainNode?.disconnect();
+      });
+    } else {
+      // If audio is disabled, clean up the compressor
+      if (audioContext) {
+        console.log('🔥 cleaning up compressor !!');
+        sourceNode?.disconnect();
+        compressor?.disconnect();
+        gainNode?.disconnect();
+      }
+    }
   });
 
   return (
@@ -61,9 +80,8 @@ export default function Home() {
       <div class="text-4xl">Audio Normalization Demo</div>
 
       <video
-        class="mx-auto"
+        class="mx-auto aspect-video bg-black"
         preload="auto"
-        // autoplay
         crossOrigin="anonymous"
         controls
         width="600"
@@ -76,12 +94,11 @@ export default function Home() {
         />
       </video>
 
-      <Likes />
       <button
         class="rounded-full bg-blue-500 text-white px-4 py-2"
-        onClick={() => setAudioEnabled(true)}
+        onClick={() => setCompressorEnabled((prev) => !prev)} // Toggle audio compressor
       >
-        Enable Audio
+        {compressorEnabled() ? 'Disable Compressor' : 'Enable Compressor'}
       </button>
     </main>
   );
