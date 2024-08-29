@@ -1,5 +1,5 @@
 import { createEffect, createSignal, onCleanup } from 'solid-js';
-import { Likes } from '~/components/Likes';
+import { Slider } from '~/components/Slider';
 
 export default function Home() {
   // signal to track if the compressor is enabled
@@ -9,9 +9,9 @@ export default function Home() {
   const [threshold, setThreshold] = createSignal(-60); // db
   const [knee, setKnee] = createSignal(0); // db
   const [ratio, setRatio] = createSignal(50); // ratio
-  const [attack, setAttack] = createSignal(0); // seconds
+  const [attack, setAttack] = createSignal(0.005); // seconds
   const [release, setRelease] = createSignal(1); // seconds
-  const [gain, setGain] = createSignal(1);
+  const [gain, setGain] = createSignal(1); // gain
 
   // Audio context, nodes, and compressor setup
   let audioContext: AudioContext | null = null;
@@ -46,12 +46,7 @@ export default function Home() {
       // Create Compressor Node if not already created
       if (!compressor) {
         compressor = audioContext.createDynamicsCompressor();
-        // Configure compressor settings
-        compressor.threshold.setValueAtTime(threshold(), audioContext.currentTime); // -60 dB threshold
-        compressor.knee.setValueAtTime(knee(), audioContext.currentTime); // 0 dB knee
-        compressor.ratio.setValueAtTime(ratio(), audioContext.currentTime); // 50:1 compression ratio
-        compressor.attack.setValueAtTime(attack(), audioContext.currentTime); // 0 ms attack
-        compressor.release.setValueAtTime(release(), audioContext.currentTime); // 1 second release
+        updateCompressorSettings();
       }
 
       // Connect nodes: source -> compressor -> gain -> destination
@@ -62,11 +57,11 @@ export default function Home() {
     } else {
       console.log('🔥 bypassing compressor !!');
 
-      // Bypass Compressor: connect source directly to gain -> destination
+      // Bypass Compressor & Gain: source -> destination
       sourceNode.disconnect();
       compressor?.disconnect();
-      sourceNode.connect(gainNode);
-      gainNode.connect(audioContext.destination);
+      gainNode?.disconnect();
+      sourceNode.connect(audioContext.destination);
     }
 
     // Cleanup effect when component unmounts
@@ -77,15 +72,29 @@ export default function Home() {
     });
   });
 
+  // Function to update compressor settings dynamically
+  function updateCompressorSettings() {
+    if (!compressor || !gainNode || !audioContext) return;
+
+    compressor.threshold.setValueAtTime(threshold(), audioContext.currentTime);
+    compressor.knee.setValueAtTime(knee(), audioContext.currentTime);
+    compressor.ratio.setValueAtTime(ratio(), audioContext.currentTime);
+    compressor.attack.setValueAtTime(attack(), audioContext.currentTime);
+    compressor.release.setValueAtTime(release(), audioContext.currentTime);
+
+    gainNode.gain.setValueAtTime(gain(), audioContext?.currentTime || 0);
+  }
+
   return (
-    <main class="container mx-auto flex justify-center items-center flex-col py-16 space-y-16">
+    <main class="container mx-auto flex justify-center items-center flex-col py-16 space-y-8">
       <div class="text-4xl">Audio Normalization Demo</div>
 
       <video
-        class="mx-auto aspect-video bg-black"
+        class="mx-auto"
         preload="auto"
         crossOrigin="anonymous"
         controls
+        autoplay={false}
         width="600"
         poster="https://illudiumfilm.com/big_buck_bunny_title_658w.jpg"
       >
@@ -96,12 +105,100 @@ export default function Home() {
         />
       </video>
 
+      {/* Button to toggle audio compressor */}
       <button
         class="rounded-full bg-blue-500 text-white px-4 py-2"
         onClick={() => setCompressorEnabled((prev) => !prev)} // Toggle audio compressor
       >
         {compressorEnabled() ? 'Disable Compressor' : 'Enable Compressor'}
       </button>
+
+      {/* Sliders to adjust compressor settings */}
+      <div class="w-full max-w-lg space-y-4">
+        {/* Threshold Slider */}
+        <Slider
+          id="thresholdSlider"
+          label="Threshold (dB)"
+          min={-100}
+          max={0}
+          step={1}
+          value={threshold()}
+          onInput={(newValue) => {
+            setThreshold(newValue);
+            updateCompressorSettings();
+          }}
+        />
+
+        {/* Knee Slider */}
+        <Slider
+          id="kneeSlider"
+          label="Knee (dB)"
+          min={0}
+          max={40}
+          step={1}
+          value={knee()}
+          onInput={(newValue) => {
+            setKnee(newValue);
+            updateCompressorSettings();
+          }}
+        />
+
+        {/* Ratio Slider */}
+        <Slider
+          id="ratioSlider"
+          label="Ratio"
+          min={1}
+          max={50}
+          step={1}
+          value={ratio()}
+          onInput={(newValue) => {
+            setRatio(newValue);
+            updateCompressorSettings();
+          }}
+        />
+
+        {/* Attack Slider */}
+        <Slider
+          id="attackSlider"
+          label="Attack (s)"
+          min={0}
+          max={1}
+          step={0.001}
+          value={attack()}
+          onInput={(newValue) => {
+            setAttack(newValue);
+            updateCompressorSettings();
+          }}
+        />
+
+        {/* Release Slider */}
+        <Slider
+          id="releaseSlider"
+          label="Release (s)"
+          min={0}
+          max={2}
+          step={0.01}
+          value={release()}
+          onInput={(newValue) => {
+            setRelease(newValue);
+            updateCompressorSettings();
+          }}
+        />
+
+        {/* Gain Slider */}
+        <Slider
+          id="gainSlider"
+          label="Gain"
+          min={0}
+          max={3}
+          step={0.1}
+          value={gain()}
+          onInput={(newValue) => {
+            setGain(newValue);
+            updateCompressorSettings();
+          }}
+        />
+      </div>
     </main>
   );
 }
