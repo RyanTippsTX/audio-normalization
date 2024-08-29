@@ -117,6 +117,19 @@ export default function Home() {
         {compressorEnabled() ? 'Disable Compressor' : 'Enable Compressor'}
       </button>
 
+      {/* MDN Docs link */}
+      <div>
+        {/* https://developer.mozilla.org/en-US/docs/Web/API/DynamicsCompressorNode */}
+        <a
+          href="https://developer.mozilla.org/en-US/docs/Web/API/DynamicsCompressorNode"
+          target="_blank"
+          rel="noreferrer"
+          class="text-blue-500 text-smx hover:underline"
+        >
+          MDN Docs
+        </a>
+      </div>
+
       {/* Sliders to adjust compressor settings */}
       <div class="w-full max-w-lg space-y-4">
         {/* Threshold Slider */}
