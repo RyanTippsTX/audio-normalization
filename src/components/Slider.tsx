@@ -3,6 +3,7 @@ import { createSignal } from 'solid-js';
 export function Slider(props: {
   id: string;
   label: string;
+  description: string;
   min: number;
   max: number;
   step: number;
@@ -20,7 +21,7 @@ export function Slider(props: {
 
   return (
     <div class="w-full">
-      <label for={props.id} class="block mb-2">
+      <label for={props.id} class="block mb-1">
         {props.label}: {value()} (Min: {props.min}, Max: {props.max})
       </label>
       <input
@@ -33,6 +34,7 @@ export function Slider(props: {
         onInput={handleInput}
         class="w-full"
       />
+      <p class="text-xs text-gray-600">{props.description}</p>
     </div>
   );
 }

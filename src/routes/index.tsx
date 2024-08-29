@@ -7,9 +7,9 @@ export default function Home() {
 
   // aggressive settings
   const [threshold, setThreshold] = createSignal(-60); // db
-  const [knee, setKnee] = createSignal(0); // db
-  const [ratio, setRatio] = createSignal(50); // ratio
-  const [attack, setAttack] = createSignal(0.005); // seconds
+  const [knee, setKnee] = createSignal(3); // db
+  const [ratio, setRatio] = createSignal(45); // ratio
+  const [attack, setAttack] = createSignal(0.01); // seconds
   const [release, setRelease] = createSignal(1); // seconds
   const [gain, setGain] = createSignal(1); // gain
 
@@ -114,11 +114,12 @@ export default function Home() {
       </button>
 
       {/* Sliders to adjust compressor settings */}
-      <div class="w-full max-w-lg space-y-4">
+      <div class="w-full max-w-xl space-y-4">
         {/* Threshold Slider */}
         <Slider
           id="thresholdSlider"
           label="Threshold (dB)"
+          description="The level above which compression is applied. A lower threshold means more of the signal will be compressed."
           min={-100}
           max={0}
           step={1}
@@ -133,6 +134,7 @@ export default function Home() {
         <Slider
           id="kneeSlider"
           label="Knee (dB)"
+          description="The range above the threshold where the compression curve starts to take effect. A higher value makes the compression smoother."
           min={0}
           max={40}
           step={1}
@@ -147,6 +149,7 @@ export default function Home() {
         <Slider
           id="ratioSlider"
           label="Ratio"
+          description="The amount of compression (e.g., 12:1 means for every 12 dB above the threshold, only 1 dB will pass through)."
           min={1}
           max={50}
           step={1}
@@ -161,6 +164,7 @@ export default function Home() {
         <Slider
           id="attackSlider"
           label="Attack (s)"
+          description="How quickly the compressor starts to compress the signal after it exceeds the threshold."
           min={0}
           max={1}
           step={0.001}
@@ -175,6 +179,7 @@ export default function Home() {
         <Slider
           id="releaseSlider"
           label="Release (s)"
+          description="How quickly the compressor stops compressing after the signal drops below the threshold."
           min={0}
           max={2}
           step={0.01}
@@ -189,6 +194,7 @@ export default function Home() {
         <Slider
           id="gainSlider"
           label="Gain"
+          description="The output gain of the compressor. A value of 1 means no change in volume."
           min={0}
           max={3}
           step={0.1}
