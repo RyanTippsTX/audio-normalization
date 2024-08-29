@@ -1,25 +1,24 @@
-import { A } from "@solidjs/router";
-import Counter from "~/components/Counter";
+import { A } from '@solidjs/router';
+import Counter from '~/components/Counter';
 
 export default function Home() {
   return (
-    <main class="text-center mx-auto text-gray-700 p-4">
-      <h1 class="max-6-xs text-6xl text-sky-700 font-thin uppercase my-16">Hello world!</h1>
-      <Counter />
-      <p class="mt-8">
-        Visit{" "}
-        <a href="https://solidjs.com" target="_blank" class="text-sky-600 hover:underline">
-          solidjs.com
-        </a>{" "}
-        to learn how to build Solid apps.
-      </p>
-      <p class="my-4">
-        <span>Home</span>
-        {" - "}
-        <A href="/about" class="text-sky-600 hover:underline">
-          About Page
-        </A>{" "}
-      </p>
+    <main class="container mx-auto">
+      <div class="text-center py-20">
+        <div class="text-4xl">Audio Normalization Demo</div>
+      </div>
+      <div>
+        <video
+          class="mx-auto"
+          preload="auto"
+          // autoplay
+          controls
+          width="600"
+          poster="https://assets.codepen.io/32795/poster.png"
+        >
+          <source id="mp4" src="http://media.w3.org/2010/05/sintel/trailer.mp4" type="video/mp4" />
+        </video>
+      </div>
     </main>
   );
 }
