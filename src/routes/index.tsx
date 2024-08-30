@@ -3,6 +3,7 @@ import { Slider } from '~/components/Slider';
 import clsx from 'clsx';
 
 export default function Home() {
+  let videoElement: HTMLVideoElement | undefined;
   // signal to track if the compressor is enabled
   const [compressorEnabled, setCompressorEnabled] = createSignal(false);
 
@@ -24,7 +25,6 @@ export default function Home() {
   const initializeAudioContext = () => {
     if (!audioContext) {
       audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const videoElement = document.querySelector('video');
       if (!videoElement) {
         throw new Error('Video element not found!');
       }
@@ -89,6 +89,7 @@ export default function Home() {
       <div class="text-4xl text-center">Audio Normalization Demo</div>
 
       <video
+        ref={videoElement}
         class="mx-auto bg-black aspect-video"
         preload="auto"
         crossOrigin="anonymous"
