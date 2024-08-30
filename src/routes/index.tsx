@@ -1,6 +1,7 @@
 import { createEffect, createSignal, onCleanup } from 'solid-js';
 import { Slider } from '~/components/Slider';
 import clsx from 'clsx';
+import { Graph } from '~/components/Graph';
 
 export default function Home() {
   // signal to track if the compressor is enabled
@@ -230,6 +231,7 @@ export default function Home() {
           }}
         />
       </div>
+      <Graph />
     </main>
   );
 }
